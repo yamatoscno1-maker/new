@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { ShootingEvent, ShootingStatus, ShootingCategory } from '../types';
 import { statusLabel, categoryLabel } from '../utils';
@@ -34,21 +34,9 @@ export const EventModal: React.FC<Props> = ({ event, initialDate, onSave, onDele
     if (initialDate) d.date = initialDate;
     return d;
   });
-  const [equipInput, setEquipInput] = useState('');
 
   const set = (key: keyof ShootingEvent, val: any) =>
     setForm(f => ({ ...f, [key]: val }));
-
-  const addEquip = () => {
-    const v = equipInput.trim();
-    if (v) {
-      set('equipment', [...form.equipment, v]);
-      setEquipInput('');
-    }
-  };
-
-  const removeEquip = (i: number) =>
-    set('equipment', form.equipment.filter((_, idx) => idx !== i));
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,38 +102,6 @@ export const EventModal: React.FC<Props> = ({ event, initialDate, onSave, onDele
             <div className="form-group full">
               <label>撮影場所</label>
               <input value={form.location} onChange={e => set('location', e.target.value)} placeholder="例: 新宿御苑" />
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label>クライアント</label>
-              <input value={form.client} onChange={e => set('client', e.target.value)} placeholder="例: 田中太郎" />
-            </div>
-            <div className="form-group">
-              <label>料金 (円)</label>
-              <input type="number" value={form.fee} onChange={e => set('fee', Number(e.target.value))} min={0} />
-            </div>
-          </div>
-
-          <div className="form-group full">
-            <label>機材</label>
-            <div className="equip-input">
-              <input
-                value={equipInput}
-                onChange={e => setEquipInput(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addEquip(); } }}
-                placeholder="機材を入力してEnter"
-              />
-              <button type="button" onClick={addEquip}>追加</button>
-            </div>
-            <div className="equip-tags">
-              {form.equipment.map((eq, i) => (
-                <span key={i} className="equip-tag">
-                  {eq}
-                  <button type="button" onClick={() => removeEquip(i)}>✕</button>
-                </span>
-              ))}
             </div>
           </div>
 
