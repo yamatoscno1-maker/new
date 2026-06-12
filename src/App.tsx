@@ -5,10 +5,11 @@ import { Calendar } from './components/Calendar';
 import { EventModal } from './components/EventModal';
 import { EventList } from './components/EventList';
 import { Dashboard } from './components/Dashboard';
+import { SalesDashboard } from './components/SalesDashboard';
 import { ShootingEvent } from './types';
 import './App.css';
 
-type View = 'calendar' | 'list' | 'dashboard';
+type View = 'calendar' | 'list' | 'dashboard' | 'sales';
 
 function App() {
   const [events, setEvents] = useState<ShootingEvent[]>([]);
@@ -87,6 +88,9 @@ function App() {
           <button className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} onClick={() => setView('dashboard')}>
             📊 ダッシュボード
           </button>
+          <button className={`nav-btn ${view === 'sales' ? 'active' : ''}`} onClick={() => setView('sales')}>
+            💰 売上管理
+          </button>
         </nav>
         <div className="header-right">
           <button className="add-btn" onClick={() => { setEditingEvent(null); setSelectedDate(null); setModalOpen(true); }}>
@@ -104,6 +108,9 @@ function App() {
         )}
         {view === 'dashboard' && (
           <Dashboard events={events} />
+        )}
+        {view === 'sales' && (
+          <SalesDashboard events={events} />
         )}
       </main>
 
