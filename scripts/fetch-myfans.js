@@ -2,8 +2,7 @@ const puppeteer = require('puppeteer');
 const { initializeApp, cert } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
 
-const EMAIL = process.env.MYFANS_EMAIL;
-const PASSWORD = process.env.MYFANS_PASSWORD;
+const ACCOUNTS = JSON.parse(process.env.MYFANS_ACCOUNTS);
 const SERVICE_ACCOUNT = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
 initializeApp({ credential: cert(SERVICE_ACCOUNT) });
@@ -15,44 +14,19 @@ function currentTab() {
   return `${mm}-${now.getFullYear()}`;
 }
 
-async function fetchSales() {
-  const browser = await puppeteer.launch({
-    headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
+async function fetchAccountSales(browser, account) {
   const page = await browser.newPage();
-
   try {
-    // ---- Login ----
-    console.log('Logging in...');
-    await page.goto('https://myfans.jp/login', { waitUntil: 'networkidle2' });
+    console.log(`[${account.name}] Logging in...`);
+    await page.goto('https://myfans.jp/login', { waitUntil: 'networkidle2', timeout: 30000 });
 
-    await page.type('input[type="email"], input[name="email"]', EMAIL, { delay: 50 });
-    await page.type('input[type="password"], input[name="password"]', PASSWORD, { delay: 50 });
+    await page.type('input[type="email"]', account.email, { delay: 30 });
+    await page.type('input[type="password"]', account.password, { delay: 30 });
 
     await Promise.all([
       page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }),
       page.click('button[type="submit"]'),
     ]);
-
-    console.log('Logged in. Fetching sales...');
-
-    // ---- Intercept API response ----
-    const salesData = [];
-
-    page.on('response', async (res) => {
-      const url = res.url();
-      if (url.includes('/sales') && res.request().method() === 'GET') {
-        try {
-          const json = await res.json();
-          if (json && (json.data || Array.isArray(json))) {
-            const items = json.data || json;
-            salesData.push(...items);
-            console.log(`Captured ${items.length} records from API`);
-          }
-        } catch (_) {}
-      }
-    });
 
     const tab = currentTab();
     let allItems = [];
@@ -60,47 +34,80 @@ async function fetchSales() {
     const PER_PAGE = 50;
 
     while (true) {
-      const url = `https://myfans.jp/account/sales?tab=${tab}&page=${pageNum}&per_page=${PER_PAGE}`;
-      salesData.length = 0;
-      await page.goto(url, { waitUntil: 'networkidle2' });
-      await new Promise(r => setTimeout(r, 2000));
+      const apiData = [];
 
-      if (salesData.length === 0) {
-        // Fallback: try to scrape from DOM
-        const domItems = await page.evaluate(() => {
-          const rows = document.querySelectorAll('table tr, [class*="sale"], [class*="row"]');
-          return Array.from(rows).map(r => r.innerText.trim()).filter(Boolean);
-        });
-        console.log(`DOM fallback: ${domItems.length} rows`);
-        if (domItems.length <= 1) break; // header only or empty
-        allItems.push(...domItems.map(text => ({ raw: text, page: pageNum })));
+      // APIレスポンスを傍受
+      const handler = async (res) => {
+        const url = res.url();
+        if (url.includes('sales') && res.request().method() === 'GET') {
+          try {
+            const json = await res.json();
+            const items = json.data ?? json.sales ?? (Array.isArray(json) ? json : null);
+            if (items) apiData.push(...items);
+          } catch (_) {}
+        }
+      };
+      page.on('response', handler);
+
+      const url = `https://myfans.jp/account/sales?tab=${tab}&page=${pageNum}&per_page=${PER_PAGE}`;
+      await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+      await new Promise(r => setTimeout(r, 2000));
+      page.off('response', handler);
+
+      if (apiData.length > 0) {
+        allItems.push(...apiData);
+        console.log(`[${account.name}] Page ${pageNum}: ${apiData.length} records`);
+        if (apiData.length < PER_PAGE) break;
       } else {
-        allItems.push(...salesData);
-        if (salesData.length < PER_PAGE) break;
+        // DOM フォールバック
+        const total = await page.evaluate(() => {
+          const el = document.querySelector('[class*="total"], [class*="amount"]');
+          return el ? el.innerText : null;
+        });
+        console.log(`[${account.name}] DOM total: ${total}`);
+        break;
       }
 
       pageNum++;
-      if (pageNum > 20) break; // safety
+      if (pageNum > 20) break;
     }
 
-    console.log(`Total records: ${allItems.length}`);
-
-    // ---- Save to Firestore ----
-    const docRef = db.collection('myfans_sales').doc(tab);
-    await docRef.set({
+    // Firestore に保存
+    const docId = `${account.name}_${tab}`;
+    await db.collection('myfans_sales').doc(docId).set({
+      accountName: account.name,
       tab,
       fetchedAt: new Date().toISOString(),
       count: allItems.length,
       items: allItems,
     });
 
-    console.log(`Saved to Firestore: myfans_sales/${tab}`);
-    return allItems.length;
+    console.log(`[${account.name}] Saved ${allItems.length} records.`);
+    return allItems;
+  } catch (err) {
+    console.error(`[${account.name}] Error:`, err.message);
+    return [];
   } finally {
-    await browser.close();
+    await page.close();
   }
 }
 
-fetchSales()
-  .then(count => { console.log(`Done. ${count} records saved.`); process.exit(0); })
-  .catch(err => { console.error('Error:', err); process.exit(1); });
+async function main() {
+  const browser = await puppeteer.launch({
+    headless: 'new',
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+
+  try {
+    for (const account of ACCOUNTS) {
+      await fetchAccountSales(browser, account);
+      await new Promise(r => setTimeout(r, 3000)); // アカウント間に待機
+    }
+  } finally {
+    await browser.close();
+  }
+
+  console.log('All accounts done.');
+}
+
+main().then(() => process.exit(0)).catch(err => { console.error(err); process.exit(1); });
