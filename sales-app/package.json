@@ -2,7 +2,7 @@
   "name": "sales-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://yamatoscno1-maker.github.io/sales-app",
+  "homepage": "https://yamatoscno1-maker.github.io/new/sales",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
@@ -24,7 +24,7 @@
   },
   "scripts": {
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d build --dest sales",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
