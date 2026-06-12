@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Account, AccountGroup, SaleRecord } from '../types';
 import './Dashboard.css';
 
-type Period = '7' | '30' | 'month' | '90' | '365' | 'custom';
+type Period = 'today' | 'yesterday' | 'month' | 'lastmonth' | '365' | 'custom';
 type GroupFilter = 'all' | 'omnibus' | 'personal';
 
 const COLORS = [
@@ -18,16 +18,16 @@ const GROUP_LABELS: Record<AccountGroup, string> = {
 };
 
 const PERIOD_LABELS: Record<Period, string> = {
-  '7': '7日', '30': '30日', month: '今月', '90': '90日', '365': '1年', custom: 'カスタム',
+  today: '今日', yesterday: '昨日', month: '今月', lastmonth: '先月', '365': '1年', custom: 'カスタム',
 };
 
 function getPeriodRange(period: Period, cf: string, ct: string) {
   const today = new Date();
   const fmt = (d: Date) => d.toISOString().slice(0, 10);
-  if (period === '7') { const f = new Date(today); f.setDate(today.getDate()-6); return { from: fmt(f), to: fmt(today) }; }
-  if (period === '30') { const f = new Date(today); f.setDate(today.getDate()-29); return { from: fmt(f), to: fmt(today) }; }
+  if (period === 'today') { return { from: fmt(today), to: fmt(today) }; }
+  if (period === 'yesterday') { const y = new Date(today); y.setDate(today.getDate()-1); return { from: fmt(y), to: fmt(y) }; }
   if (period === 'month') { return { from: fmt(today).slice(0,7)+'-01', to: fmt(today) }; }
-  if (period === '90') { const f = new Date(today); f.setDate(today.getDate()-89); return { from: fmt(f), to: fmt(today) }; }
+  if (period === 'lastmonth') { const lm = new Date(today.getFullYear(), today.getMonth()-1, 1); const lme = new Date(today.getFullYear(), today.getMonth(), 0); return { from: fmt(lm), to: fmt(lme) }; }
   if (period === '365') { const f = new Date(today); f.setFullYear(today.getFullYear()-1); return { from: fmt(f), to: fmt(today) }; }
   return { from: cf || fmt(today), to: ct || fmt(today) };
 }
