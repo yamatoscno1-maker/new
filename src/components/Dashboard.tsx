@@ -5,9 +5,10 @@ import './Dashboard.css';
 
 interface Props {
   events: ShootingEvent[];
+  onChangePassword?: () => void;
 }
 
-export const Dashboard: React.FC<Props> = ({ events }) => {
+export const Dashboard: React.FC<Props> = ({ events, onChangePassword }) => {
   const now = new Date().toISOString().slice(0, 10);
   const thisMonth = now.slice(0, 7);
 
@@ -41,6 +42,11 @@ export const Dashboard: React.FC<Props> = ({ events }) => {
 
   return (
     <div className="dashboard">
+      {onChangePassword && (
+        <div className="dash-actions">
+          <button className="change-pw-btn" onClick={onChangePassword}>🔑 パスワードを変更</button>
+        </div>
+      )}
       <div className="stat-cards">
         <div className="stat-card">
           <div className="stat-icon">📅</div>

@@ -104,3 +104,24 @@
   .stat-cards { grid-template-columns: 1fr 1fr; }
   .dashboard-grid { grid-template-columns: 1fr; }
 }
+
+.dash-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.change-pw-btn {
+  background: none;
+  border: 1px solid #e2e8f0;
+  color: #718096;
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+
+.change-pw-btn:hover {
+  background: #f7fafc;
+  color: #4a5568;
+}

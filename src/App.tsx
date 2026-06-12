@@ -3,14 +3,19 @@ import { Calendar } from './components/Calendar';
 import { EventModal } from './components/EventModal';
 import { EventList } from './components/EventList';
 import { Dashboard } from './components/Dashboard';
+import { LockScreen } from './components/LockScreen';
 import { ShootingEvent } from './types';
 import './App.css';
 
 type View = 'calendar' | 'list' | 'dashboard';
 
 const STORAGE_KEY = 'shooting-events';
+const PASSWORD_KEY = 'app-password';
 
 function App() {
+  const [unlocked, setUnlocked] = useState(false);
+  const [hasPassword, setHasPassword] = useState(() => !!localStorage.getItem(PASSWORD_KEY));
+
   const [events, setEvents] = useState<ShootingEvent[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved ? JSON.parse(saved) : [];
@@ -23,6 +28,27 @@ function App() {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
   }, [events]);
+
+  const handleSetPassword = (password: string) => {
+    localStorage.setItem(PASSWORD_KEY, password);
+    setHasPassword(true);
+  };
+
+  const handleChangePassword = () => {
+    if (window.confirm('パスワードを変更しますか？')) {
+      localStorage.removeItem(PASSWORD_KEY);
+      setHasPassword(false);
+      setUnlocked(false);
+    }
+  };
+
+  if (!hasPassword) {
+    return <LockScreen isSetup onUnlock={() => setUnlocked(true)} onSetPassword={handleSetPassword} />;
+  }
+
+  if (!unlocked) {
+    return <LockScreen onUnlock={() => setUnlocked(true)} />;
+  }
 
   const handleAddEvent = (event: ShootingEvent) => {
     setEvents(prev => [...prev, event]);
@@ -79,12 +105,12 @@ function App() {
             📊 ダッシュボード
           </button>
         </nav>
-        <button
-          className="add-btn"
-          onClick={() => { setEditingEvent(null); setSelectedDate(null); setModalOpen(true); }}
-        >
-          ＋ 撮影を追加
-        </button>
+        <div className="header-right">
+          <button className="lock-btn-header" onClick={() => setUnlocked(false)} title="ロック">🔒</button>
+          <button className="add-btn" onClick={() => { setEditingEvent(null); setSelectedDate(null); setModalOpen(true); }}>
+            ＋ 撮影を追加
+          </button>
+        </div>
       </header>
 
       <main className="app-main">
@@ -103,7 +129,7 @@ function App() {
           />
         )}
         {view === 'dashboard' && (
-          <Dashboard events={events} />
+          <Dashboard events={events} onChangePassword={handleChangePassword} />
         )}
       </main>
 

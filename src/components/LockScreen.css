@@ -1,0 +1,88 @@
+.lockscreen {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.lock-card {
+  background: white;
+  border-radius: 16px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+}
+
+.lock-icon {
+  font-size: 52px;
+  margin-bottom: 16px;
+}
+
+.lock-card h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 8px;
+}
+
+.lock-sub {
+  color: #718096;
+  font-size: 14px;
+  margin-bottom: 28px;
+}
+
+.lock-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lock-form input {
+  width: 100%;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 16px;
+  text-align: center;
+  letter-spacing: 0.2em;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.lock-form input:focus {
+  border-color: #3182ce;
+}
+
+.lock-error {
+  color: #e53e3e;
+  font-size: 13px;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+
+.shake { animation: shake 0.4s ease; border-color: #fc8181 !important; }
+
+.lock-btn {
+  background: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 4px;
+}
+
+.lock-btn:hover { background: #2b6cb0; }
