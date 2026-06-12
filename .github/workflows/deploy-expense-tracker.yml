@@ -1,0 +1,39 @@
+name: Deploy Expense Tracker
+
+on:
+  push:
+    branches: [claude/vibrant-fermat-22k67d, main]
+    paths: [expense-tracker/**]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: expense-tracker/package-lock.json
+
+      - name: Install
+        run: npm ci
+        working-directory: expense-tracker
+
+      - name: Build
+        run: npm run build
+        working-directory: expense-tracker
+        env:
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: expense-tracker/dist
+          destination_dir: expense-tracker
