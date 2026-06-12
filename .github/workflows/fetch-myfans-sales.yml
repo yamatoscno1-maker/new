@@ -1,9 +1,15 @@
 name: Fetch MyFans Sales
 
 on:
+  push:
+    branches: [claude/vibrant-fermat-22k67d, main]
+    paths: [scripts/fetch-myfans.js]
   schedule:
-    - cron: '0 * * * *'  # 1時間おき
-  workflow_dispatch:       # 手動実行も可能
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   fetch:
@@ -17,9 +23,8 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: |
-          cd scripts
-          npm install puppeteer firebase-admin
+        working-directory: scripts
+        run: npm install
 
       - name: Run fetch script
         env:
