@@ -19,6 +19,10 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    localStorage.removeItem('app-password');
+  }, []);
+
+  useEffect(() => {
     const unsub = onSnapshot(collection(db, 'events'), snapshot => {
       const data = snapshot.docs.map(d => ({ ...d.data(), id: d.id } as ShootingEvent));
       setEvents(data);
