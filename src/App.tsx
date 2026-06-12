@@ -6,13 +6,14 @@ import { EventModal } from './components/EventModal';
 import { EventList } from './components/EventList';
 import { Dashboard } from './components/Dashboard';
 import { SalesDashboard } from './components/SalesDashboard';
-import { ShootingEvent } from './types';
+import { ShootingEvent, Account } from './types';
 import './App.css';
 
 type View = 'calendar' | 'list' | 'dashboard' | 'sales';
 
 function App() {
   const [events, setEvents] = useState<ShootingEvent[]>([]);
+  const [accounts, setAccounts] = useState<Account[]>([]);
   const [view, setView] = useState<View>('calendar');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [editingEvent, setEditingEvent] = useState<ShootingEvent | null>(null);
@@ -24,12 +25,25 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, 'events'), snapshot => {
+    let eventsLoaded = false;
+    let accountsLoaded = false;
+    const checkDone = () => { if (eventsLoaded && accountsLoaded) setLoading(false); };
+
+    const unsubEvents = onSnapshot(collection(db, 'events'), snapshot => {
       const data = snapshot.docs.map(d => ({ ...d.data(), id: d.id } as ShootingEvent));
       setEvents(data);
-      setLoading(false);
+      eventsLoaded = true;
+      checkDone();
     });
-    return unsub;
+
+    const unsubAccounts = onSnapshot(collection(db, 'accounts'), snapshot => {
+      const data = snapshot.docs.map(d => ({ ...d.data(), id: d.id } as Account));
+      setAccounts(data);
+      accountsLoaded = true;
+      checkDone();
+    });
+
+    return () => { unsubEvents(); unsubAccounts(); };
   }, []);
 
   const handleAddEvent = async (event: ShootingEvent) => {
@@ -49,6 +63,20 @@ function App() {
     await deleteDoc(doc(db, 'events', id));
     setModalOpen(false);
     setEditingEvent(null);
+  };
+
+  const handleAddAccount = async (account: Account) => {
+    const { id, ...data } = account;
+    await addDoc(collection(db, 'accounts'), data);
+  };
+
+  const handleUpdateAccount = async (account: Account) => {
+    const { id, ...data } = account;
+    await updateDoc(doc(db, 'accounts', id), data);
+  };
+
+  const handleDeleteAccount = async (id: string) => {
+    await deleteDoc(doc(db, 'accounts', id));
   };
 
   const handleDateClick = (date: string) => {
@@ -110,7 +138,13 @@ function App() {
           <Dashboard events={events} />
         )}
         {view === 'sales' && (
-          <SalesDashboard events={events} />
+          <SalesDashboard
+            events={events}
+            accounts={accounts}
+            onAddAccount={handleAddAccount}
+            onUpdateAccount={handleUpdateAccount}
+            onDeleteAccount={handleDeleteAccount}
+          />
         )}
       </main>
 
@@ -118,6 +152,7 @@ function App() {
         <EventModal
           initialDate={selectedDate}
           event={editingEvent}
+          accounts={accounts}
           onSave={editingEvent ? handleUpdateEvent : handleAddEvent}
           onDelete={editingEvent ? () => handleDeleteEvent(editingEvent.id) : undefined}
           onClose={() => { setModalOpen(false); setEditingEvent(null); }}

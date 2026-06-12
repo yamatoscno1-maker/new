@@ -2,6 +2,15 @@ export type ShootingStatus = 'scheduled' | 'confirmed' | 'completed' | 'cancelle
 
 export type ShootingCategory = 'portrait' | 'wedding' | 'commercial' | 'event' | 'landscape' | 'other';
 
+export type AccountGroup = 'omnibus' | 'personal';
+
+export interface Account {
+  id: string;
+  name: string;
+  group: AccountGroup;
+  color: string;
+}
+
 export interface ShootingEvent {
   id: string;
   title: string;
@@ -10,6 +19,7 @@ export interface ShootingEvent {
   endTime: string;
   location: string;
   client: string;
+  accountId: string;
   category: ShootingCategory;
   status: ShootingStatus;
   notes: string;

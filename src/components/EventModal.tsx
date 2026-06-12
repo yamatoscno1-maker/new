@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ShootingEvent, ShootingStatus, ShootingCategory } from '../types';
+import { ShootingEvent, ShootingStatus, ShootingCategory, Account } from '../types';
 import { statusLabel, categoryLabel } from '../utils';
 import './EventModal.css';
 
 interface Props {
   event: ShootingEvent | null;
   initialDate: string | null;
+  accounts: Account[];
   onSave: (event: ShootingEvent) => void;
   onDelete?: () => void;
   onClose: () => void;
@@ -20,6 +21,7 @@ const defaultForm = (): ShootingEvent => ({
   endTime: '12:00',
   location: '',
   client: '',
+  accountId: '',
   category: 'portrait',
   status: 'scheduled',
   notes: '',
@@ -27,7 +29,7 @@ const defaultForm = (): ShootingEvent => ({
   fee: 0,
 });
 
-export const EventModal: React.FC<Props> = ({ event, initialDate, onSave, onDelete, onClose }) => {
+export const EventModal: React.FC<Props> = ({ event, initialDate, accounts, onSave, onDelete, onClose }) => {
   const [form, setForm] = useState<ShootingEvent>(() => {
     if (event) return { ...event };
     const d = defaultForm();
@@ -43,6 +45,9 @@ export const EventModal: React.FC<Props> = ({ event, initialDate, onSave, onDele
     if (!form.title.trim()) return;
     onSave(form);
   };
+
+  const omnibusAccounts = accounts.filter(a => a.group === 'omnibus');
+  const personalAccounts = accounts.filter(a => a.group === 'personal');
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -81,6 +86,33 @@ export const EventModal: React.FC<Props> = ({ event, initialDate, onSave, onDele
 
           <div className="form-row">
             <div className="form-group">
+              <label>アカウント</label>
+              <select value={form.accountId} onChange={e => set('accountId', e.target.value)}>
+                <option value="">未選択</option>
+                {omnibusAccounts.length > 0 && (
+                  <optgroup label="オムニバス事業">
+                    {omnibusAccounts.map(a => (
+                      <option key={a.id} value={a.id}>{a.name}</option>
+                    ))}
+                  </optgroup>
+                )}
+                {personalAccounts.length > 0 && (
+                  <optgroup label="個人アカウント">
+                    {personalAccounts.map(a => (
+                      <option key={a.id} value={a.id}>{a.name}</option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>クライアント名</label>
+              <input value={form.client} onChange={e => set('client', e.target.value)} placeholder="例: 株式会社〇〇" />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
               <label>カテゴリ</label>
               <select value={form.category} onChange={e => set('category', e.target.value as ShootingCategory)}>
                 {(['portrait','wedding','commercial','event','landscape','other'] as ShootingCategory[]).map(c => (
@@ -99,7 +131,17 @@ export const EventModal: React.FC<Props> = ({ event, initialDate, onSave, onDele
           </div>
 
           <div className="form-row">
-            <div className="form-group full">
+            <div className="form-group">
+              <label>売上（円）</label>
+              <input
+                type="number"
+                min={0}
+                value={form.fee}
+                onChange={e => set('fee', Number(e.target.value))}
+                placeholder="0"
+              />
+            </div>
+            <div className="form-group">
               <label>撮影場所</label>
               <input value={form.location} onChange={e => set('location', e.target.value)} placeholder="例: 新宿御苑" />
             </div>
