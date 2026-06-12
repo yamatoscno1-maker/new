@@ -1,0 +1,28 @@
+name: Fetch MyFans Sales
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # 1時間おき
+  workflow_dispatch:       # 手動実行も可能
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          cd scripts
+          npm install puppeteer firebase-admin
+
+      - name: Run fetch script
+        env:
+          MYFANS_ACCOUNTS: ${{ secrets.MYFANS_ACCOUNTS }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node scripts/fetch-myfans.js
