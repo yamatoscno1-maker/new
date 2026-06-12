@@ -1,0 +1,91 @@
+.expense-list {
+  padding: 24px;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.filter-btn {
+  background: #1e293b;
+  color: #94a3b8;
+  border: 1px solid #334155;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filter-btn:hover { background: #334155; }
+.filter-btn.active { background: #334155; color: #f1f5f9; }
+
+.empty {
+  text-align: center;
+  color: #64748b;
+  padding: 60px;
+}
+
+.expense-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.expense-item {
+  background: #1e293b;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.expense-merchant {
+  color: #f1f5f9;
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.expense-meta {
+  display: flex;
+  gap: 10px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.expense-source {
+  background: #334155;
+  border-radius: 4px;
+  padding: 1px 6px;
+  color: #94a3b8;
+}
+
+.expense-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.expense-amount {
+  color: #f1f5f9;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.business-select {
+  background: #0f172a;
+  color: #cbd5e1;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
