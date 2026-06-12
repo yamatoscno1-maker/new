@@ -62,14 +62,7 @@ export const Dashboard: React.FC<Props> = ({ events, onChangePassword }) => {
             <div className="stat-label">完了した撮影</div>
           </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-icon">💰</div>
-          <div className="stat-body">
-            <div className="stat-value">¥{totalFee.toLocaleString()}</div>
-            <div className="stat-label">累計売上</div>
-          </div>
-        </div>
-        <div className="stat-card">
+<div className="stat-card">
           <div className="stat-icon">🗓️</div>
           <div className="stat-body">
             <div className="stat-value">{thisMonthEvents.length}</div>
