@@ -140,9 +140,13 @@
 }
 
 @media (max-width: 600px) {
-  .cal-cell { min-height: 60px; padding: 3px; }
-  .cal-event-chip { font-size: 9px; padding: 1px 3px; }
-  .cal-dow { padding: 6px 2px; font-size: 11px; }
-  .cal-legend { gap: 10px; padding: 10px 12px; flex-wrap: wrap; }
+  .calendar { border-radius: 8px; }
+  .cal-cell { min-height: 52px; padding: 2px; min-width: 0; overflow: hidden; }
+  .cal-event-chip { font-size: 8px; padding: 1px 2px; }
+  .cal-dow { padding: 5px 0; font-size: 11px; text-align: center; }
+  .cal-date { font-size: 11px; width: 22px; height: 22px; }
+  .cal-legend { gap: 8px; padding: 8px 10px; flex-wrap: wrap; font-size: 11px; }
+  .cal-header { padding: 12px; }
   .cal-header h2 { font-size: 16px; }
+  .cal-grid { overflow-x: hidden; }
 }
