@@ -125,3 +125,11 @@
   background: #f7fafc;
   color: #4a5568;
 }
+
+@media (max-width: 600px) {
+  .stat-cards { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card { padding: 14px; }
+  .stat-value { font-size: 22px; }
+  .stat-icon { font-size: 24px; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+}

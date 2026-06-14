@@ -107,3 +107,10 @@
   font-weight: 700;
   color: #2d3748;
 }
+
+@media (max-width: 600px) {
+  .list-toolbar { flex-direction: column; }
+  .list-toolbar select { width: 100%; }
+  .list-item-meta { gap: 6px; }
+  .list-item { padding: 12px; gap: 10px; }
+}

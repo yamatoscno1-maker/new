@@ -158,3 +158,11 @@
 }
 
 .btn-save:hover { background: #2b6cb0; }
+
+@media (max-width: 600px) {
+  .modal { max-height: 95vh; border-radius: 12px 12px 0 0; }
+  .modal-backdrop { align-items: flex-end; padding: 0; }
+  .modal-body { padding: 16px; }
+  .modal-header { padding: 16px; }
+  .form-row { flex-direction: column; }
+}

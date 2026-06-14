@@ -139,3 +139,19 @@ body {
 }
 
 .loading-screen p { color: #718096; font-size: 16px; }
+
+@media (max-width: 600px) {
+  .app-header {
+    padding: 0 12px;
+    height: auto;
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+  .app-header h1 { font-size: 15px; }
+  .header-nav { order: 3; width: 100%; justify-content: center; }
+  .nav-btn { font-size: 12px; padding: 5px 10px; }
+  .header-right { margin-left: auto; }
+  .add-btn { font-size: 13px; padding: 7px 12px; }
+  .app-main { padding: 12px; }
+}

@@ -138,3 +138,11 @@
   border-radius: 50%;
   display: inline-block;
 }
+
+@media (max-width: 600px) {
+  .cal-cell { min-height: 60px; padding: 3px; }
+  .cal-event-chip { font-size: 9px; padding: 1px 3px; }
+  .cal-dow { padding: 6px 2px; font-size: 11px; }
+  .cal-legend { gap: 10px; padding: 10px 12px; flex-wrap: wrap; }
+  .cal-header h2 { font-size: 16px; }
+}
