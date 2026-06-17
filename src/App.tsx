@@ -5,10 +5,11 @@ import { Calendar } from './components/Calendar';
 import { EventModal } from './components/EventModal';
 import { EventList } from './components/EventList';
 import { Dashboard } from './components/Dashboard';
-import { ShootingEvent } from './types';
+import { InvoiceSummary } from './components/InvoiceSummary';
+import { ShootingEvent, InvoiceStatus } from './types';
 import './App.css';
 
-type View = 'calendar' | 'list' | 'dashboard';
+type View = 'calendar' | 'list' | 'dashboard' | 'invoice';
 
 function App() {
   const [events, setEvents] = useState<ShootingEvent[]>([]);
@@ -42,6 +43,10 @@ function App() {
     await updateDoc(doc(db, 'events', id), data);
     setModalOpen(false);
     setEditingEvent(null);
+  };
+
+  const handleUpdateInvoiceStatus = async (id: string, invoiceStatus: InvoiceStatus) => {
+    await updateDoc(doc(db, 'events', id), { invoiceStatus });
   };
 
   const handleDeleteEvent = async (id: string) => {
@@ -87,6 +92,9 @@ function App() {
           <button className={`nav-btn ${view === 'dashboard' ? 'active' : ''}`} onClick={() => setView('dashboard')}>
             📊 ダッシュボード
           </button>
+          <button className={`nav-btn ${view === 'invoice' ? 'active' : ''}`} onClick={() => setView('invoice')}>
+            🧾 請求書
+          </button>
         </nav>
         <div className="header-right">
           <button className="add-btn" onClick={() => { setEditingEvent(null); setSelectedDate(null); setModalOpen(true); }}>
@@ -104,6 +112,9 @@ function App() {
         )}
         {view === 'dashboard' && (
           <Dashboard events={events} />
+        )}
+        {view === 'invoice' && (
+          <InvoiceSummary events={events} onUpdateInvoiceStatus={handleUpdateInvoiceStatus} />
         )}
       </main>
 

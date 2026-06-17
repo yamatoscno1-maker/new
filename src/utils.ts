@@ -1,4 +1,4 @@
-import { ShootingStatus, ShootingCategory } from './types';
+import { ShootingStatus, ShootingCategory, InvoiceStatus } from './types';
 
 export const statusColor = (status: ShootingStatus): string => {
   switch (status) {
@@ -26,6 +26,22 @@ export const categoryLabel = (cat: ShootingCategory): string => {
     case 'event': return 'イベント';
     case 'landscape': return '風景';
     case 'other': return 'その他';
+  }
+};
+
+export const invoiceStatusLabel = (s: InvoiceStatus): string => {
+  switch (s) {
+    case 'not_issued': return '請求書発行待ち';
+    case 'issued': return '請求書発行済み';
+    case 'paid': return '振り込み済み';
+  }
+};
+
+export const invoiceStatusColor = (s: InvoiceStatus): string => {
+  switch (s) {
+    case 'not_issued': return '#ed8936';
+    case 'issued': return '#3182ce';
+    case 'paid': return '#48bb78';
   }
 };
 

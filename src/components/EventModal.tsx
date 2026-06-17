@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { ShootingEvent, ShootingStatus, ShootingCategory } from '../types';
-import { statusLabel, categoryLabel } from '../utils';
+import { ShootingEvent, ShootingStatus, ShootingCategory, InvoiceStatus } from '../types';
+import { statusLabel, categoryLabel, invoiceStatusLabel } from '../utils';
 import './EventModal.css';
 
 interface Props {
@@ -104,6 +104,22 @@ export const EventModal: React.FC<Props> = ({ event, initialDate, onSave, onDele
               <input value={form.location} onChange={e => set('location', e.target.value)} placeholder="例: 新宿御苑" />
             </div>
           </div>
+
+          {form.status === 'completed' && form.fee > 0 && (
+            <div className="form-row">
+              <div className="form-group">
+                <label>請求書ステータス</label>
+                <select
+                  value={form.invoiceStatus ?? 'not_issued'}
+                  onChange={e => set('invoiceStatus', e.target.value as InvoiceStatus)}
+                >
+                  {(['not_issued', 'issued', 'paid'] as InvoiceStatus[]).map(s => (
+                    <option key={s} value={s}>{invoiceStatusLabel(s)}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
 
           <div className="form-group full">
             <label>メモ</label>

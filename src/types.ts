@@ -2,6 +2,8 @@ export type ShootingStatus = 'scheduled' | 'confirmed' | 'completed' | 'cancelle
 
 export type ShootingCategory = 'portrait' | 'wedding' | 'commercial' | 'event' | 'landscape' | 'other';
 
+export type InvoiceStatus = 'not_issued' | 'issued' | 'paid';
+
 export interface ShootingEvent {
   id: string;
   title: string;
@@ -15,4 +17,5 @@ export interface ShootingEvent {
   notes: string;
   equipment: string[];
   fee: number;
+  invoiceStatus?: InvoiceStatus;
 }
